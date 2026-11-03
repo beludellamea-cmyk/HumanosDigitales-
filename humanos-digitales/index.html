@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Humanos digitales | IA El Colorado · Expo de Ciencias 2026</title>
+<meta name="description" content="Conocé y probá los humanos digitales creados con inteligencia artificial en IA El Colorado.">
+<style>
+  :root{
+    --noche:#0a1b1f; --noche2:#123238; --teal:#3fd1b5; --oro:#f0a63a; --oro2:#ffd27a;
+    --texto:#f4efe6; --suave:#bcd3cd;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+    color:var(--texto);min-height:100vh;overflow-x:hidden;
+    background:linear-gradient(180deg,#0a1b1f 0%,#14414a 45%,#1d5a5e 70%,#0f2a2e 100%) fixed;
+  }
+
+  /* ---------- ESCENARIO: ciudad futurista ---------- */
+  .escena{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .estrellas{position:absolute;inset:0;opacity:.8;
+    background-image:
+      radial-gradient(1.5px 1.5px at 8% 12%,#fff 50%,transparent 51%),
+      radial-gradient(1px 1px at 22% 6%,#fff 50%,transparent 51%),
+      radial-gradient(1.5px 1.5px at 35% 20%,#cfeee8 50%,transparent 51%),
+      radial-gradient(1px 1px at 52% 9%,#fff 50%,transparent 51%),
+      radial-gradient(1.5px 1.5px at 66% 18%,#fff 50%,transparent 51%),
+      radial-gradient(1px 1px at 81% 7%,#cfeee8 50%,transparent 51%),
+      radial-gradient(1px 1px at 93% 22%,#fff 50%,transparent 51%),
+      radial-gradient(1px 1px at 14% 30%,#fff 50%,transparent 51%),
+      radial-gradient(1px 1px at 74% 32%,#fff 50%,transparent 51%);
+  }
+  .resplandor{position:absolute;left:50%;bottom:30vh;width:90vw;height:40vh;transform:translateX(-50%);
+    background:radial-gradient(ellipse at 50% 100%,rgba(240,166,58,.38),rgba(63,209,181,.12) 45%,transparent 70%)}
+  .ciudad{position:absolute;left:0;right:0;bottom:26vh;height:48vh;width:100%}
+  .ciudad.lejos{opacity:.55;bottom:28vh;filter:blur(.6px)}
+  .ciudad svg{width:100%;height:100%;display:block}
+  .arco{
+    position:absolute;left:50%;bottom:20vh;width:min(1100px,150vw);aspect-ratio:2/1.05;
+    transform:translateX(-50%);
+    border:16px solid var(--teal);border-bottom:0;border-radius:999px 999px 0 0;
+    box-shadow:0 0 50px rgba(63,209,181,.5),inset 0 0 0 6px var(--oro),inset 0 0 50px rgba(240,166,58,.25);
+    opacity:.5;
+  }
+  .rayos{position:absolute;left:50%;bottom:20vh;width:min(900px,130vw);aspect-ratio:2/1;transform:translateX(-50%);
+    background:repeating-conic-gradient(from 270deg at 50% 100%,rgba(240,166,58,.22) 0 1.6deg,transparent 1.6deg 7deg);
+    mask-image:radial-gradient(ellipse at 50% 100%,#000 25%,transparent 72%);
+    -webkit-mask-image:radial-gradient(ellipse at 50% 100%,#000 25%,transparent 72%);
+    clip-path:polygon(0 0,100% 0,100% 100%,0 100%);opacity:.7}
+  .piso{
+    position:absolute;left:-60%;right:-60%;bottom:0;height:34vh;
+    background:
+      linear-gradient(to right,rgba(63,209,181,.45) 1px,transparent 1px) 0 0/80px 80px,
+      linear-gradient(to bottom,rgba(63,209,181,.45) 1px,transparent 1px) 0 0/80px 80px,
+      linear-gradient(180deg,#0f3a40,#09191d);
+    transform:perspective(520px) rotateX(64deg);transform-origin:50% 100%;
+    mask-image:linear-gradient(to top,#000 30%,transparent 100%);
+    -webkit-mask-image:linear-gradient(to top,#000 30%,transparent 100%);
+  }
+  .pilar{position:absolute;bottom:22vh;width:34px;border-radius:8px 8px 0 0;
+    background:linear-gradient(90deg,#9db3ae,#fff 45%,#8ea6a1);box-shadow:0 0 18px rgba(63,209,181,.4)}
+  .pilar::before{content:"";position:absolute;left:-8px;right:-8px;top:-10px;height:12px;border-radius:4px;background:var(--oro)}
+  .pilar::after{content:"";position:absolute;left:-8px;right:-8px;bottom:-6px;height:12px;border-radius:4px;background:var(--oro)}
+  .pilar.p1{left:3vw;height:34vh}.pilar.p2{left:9vw;height:25vh;opacity:.8}.pilar.p3{left:14vw;height:19vh;opacity:.6}
+  .pilar.p4{right:3vw;height:34vh}.pilar.p5{right:9vw;height:25vh;opacity:.8}.pilar.p6{right:14vw;height:19vh;opacity:.6}
+  @media (max-width:700px){.pilar{display:none}}
+
+  /* ---------- CONTENIDO ---------- */
+  header,main,footer{position:relative;z-index:2}
+  header{text-align:center;padding:36px 20px 6px}
+  .carteles{display:flex;align-items:center;justify-content:center;gap:clamp(14px,5vw,60px);flex-wrap:wrap}
+  .cartel{
+    background:linear-gradient(180deg,#fbfaf4,#e6e3d4);border:3px solid var(--oro);border-radius:14px;
+    padding:10px 14px;box-shadow:0 0 0 4px rgba(63,209,181,.3),0 0 28px rgba(63,209,181,.45),0 12px 26px rgba(0,0,0,.45);
+    transform:perspective(600px) rotateY(var(--giro,0deg));
+  }
+  .cartel img{display:block;height:clamp(78px,13vw,122px);width:auto}
+  .cartel.izq{--giro:12deg}.cartel.der{--giro:-12deg}
+  .titulos{flex:1 1 360px;max-width:640px}
+  .evento{font-size:.78rem;letter-spacing:.32em;text-transform:uppercase;color:var(--oro2);font-weight:700}
+  h1{
+    font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.3rem,6.5vw,4.4rem);line-height:1.05;margin:10px 0 8px;color:var(--oro);
+    text-shadow:0 3px 0 #7a4a10,0 0 30px rgba(240,166,58,.5);
+  }
+  .sub{color:var(--texto);font-size:1.08rem;line-height:1.45;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+  .lema{font-family:Georgia,serif;font-style:italic;color:var(--oro2);margin-top:6px;font-size:1.05rem;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+
+  main{max-width:1120px;margin:0 auto;padding:34px 20px 80px}
+  .grilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:26px;justify-content:center}
+  .grilla:has(.tarjeta:only-child){grid-template-columns:minmax(270px,380px)}
+  .tarjeta{
+    background:linear-gradient(180deg,rgba(58,42,38,.95),rgba(34,26,24,.97));
+    border:2px solid var(--oro);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;
+    box-shadow:0 0 0 4px rgba(240,166,58,.12),0 0 34px rgba(63,209,181,.25),0 18px 40px rgba(0,0,0,.5);
+    transition:transform .25s,box-shadow .25s;
+  }
+  .tarjeta:hover,.tarjeta:focus-within{transform:translateY(-6px);box-shadow:0 0 0 4px rgba(63,209,181,.3),0 0 44px rgba(63,209,181,.4),0 24px 48px rgba(0,0,0,.6)}
+  .foto{aspect-ratio:4/3;background:#1a2c30;position:relative;overflow:hidden}
+  .foto img{width:100%;height:100%;object-fit:cover;display:block}
+  .foto .inicial{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+    font-family:Georgia,serif;font-size:4.5rem;color:var(--oro);background:radial-gradient(circle at 50% 40%,#25555a,#14282c)}
+  .foto.sin-img img{display:none}.foto.sin-img .inicial{display:flex}
+  .etiqueta{position:absolute;left:12px;top:12px;background:var(--oro);color:#2b1a05;font-size:.7rem;font-weight:800;
+    letter-spacing:.14em;text-transform:uppercase;padding:5px 10px;border-radius:8px}
+  .cuerpo{padding:18px 18px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
+  .cuerpo h2{font-family:Georgia,serif;font-size:1.6rem;color:var(--oro2)}
+  .cuerpo p{color:var(--suave);line-height:1.45;font-size:.98rem;flex:1}
+  .boton{display:inline-flex;align-items:center;justify-content:center;background:var(--oro);color:#2b1a05;font-weight:800;
+    text-decoration:none;padding:13px 18px;border-radius:14px;font-size:1rem;transition:background .2s}
+  .boton:hover{background:var(--oro2)}
+  .boton:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+  .proximamente{opacity:.6;border-style:dashed}
+  .proximamente .boton{background:#5a6b6a;color:#e9f1ef;pointer-events:none}
+  .aviso{margin:44px auto 0;max-width:700px;text-align:center;color:var(--suave);font-size:.9rem;line-height:1.5;
+    border:1px solid rgba(63,209,181,.4);border-radius:14px;padding:14px 18px;background:rgba(8,26,29,.72)}
+  footer{text-align:center;padding:0 20px 30px;color:var(--suave);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;text-shadow:0 2px 6px #000}
+  @media (max-width:700px){.titulos{order:3;flex-basis:100%}.cartel img{height:84px}.cartel{--giro:0deg !important}}
+  @media (prefers-reduced-motion:reduce){.tarjeta{transition:none}}
+</style>
+</head>
+<body>
+
+<!-- Escenario: ciudad futurista -->
+<div class="escena" aria-hidden="true">
+  <div class="estrellas"></div>
+  <div class="resplandor"></div>
+  <div class="rayos"></div>
+  <div class="arco"></div>
+  <div class="ciudad lejos" id="ciudadLejos"></div>
+  <div class="ciudad" id="ciudadCerca"></div>
+  <div class="pilar p1"></div><div class="pilar p2"></div><div class="pilar p3"></div>
+  <div class="pilar p4"></div><div class="pilar p5"></div><div class="pilar p6"></div>
+  <div class="piso"></div>
+</div>
+
+<header>
+  <div class="carteles">
+    <div class="cartel izq"><img src="img/logo-rfa.png" alt="Logo RFA El Colorado"></div>
+    <div class="titulos">
+      <div class="evento">IA El Colorado · Expo de Ciencias 2026</div>
+      <h1>Humanos digitales</h1>
+      <p class="sub">Personajes creados con inteligencia artificial. Elegí uno, entrá y charlá con él.</p>
+      <p class="lema">El futuro no se espera, se aprende.</p>
+    </div>
+    <div class="cartel der"><img src="img/logo-ia.png" alt="Logo Inteligencia Artificial"></div>
+  </div>
+</header>
+
+<main>
+  <section class="grilla" id="grilla" aria-label="Lista de humanos digitales"></section>
+  <p class="aviso">Los humanos digitales y sus historias son ficticios. Hablan con inteligencia artificial y pueden equivocarse. Algunos usan el micrófono: se te va a pedir permiso.</p>
+</main>
+
+<footer>IA El Colorado · Expo de Ciencias 2026</footer>
+
+<script>
+/* ==========================================================
+   PARA AGREGAR UN HUMANO DIGITAL: descomentá/copiá un bloque.
+   - imagen: archivo dentro de la carpeta img/ (ej: "img/nombre.jpg")
+   - url: link para probarlo (vacío = "Próximamente")
+   ========================================================== */
+const HUMANOS = [
+  {
+    nombre: "Doña Mirta",
+    etiqueta: "Vecina formoseña",
+    descripcion: "La vecina que sabe todo de la cuadra. Charlá con ella desde la ventana de su casa en el barrio El Lapacho.",
+    imagen: "img/dona-mirta.jpg",
+    url: "https://beludellamea-cmyk.github.io/do-mirta/"
+  }
+  /* , {
+    nombre: "Nombre",
+    etiqueta: "Rol o lugar",
+    descripcion: "Una frase sobre quién es.",
+    imagen: "img/nombre.jpg",
+    url: "https://..."
+  } */
+];
+
+const grilla = document.getElementById("grilla");
+for (const h of HUMANOS) {
+  const activo = !!h.url;
+  const art = document.createElement("article");
+  art.className = "tarjeta" + (activo ? "" : " proximamente");
+  const foto = document.createElement("div"); foto.className = "foto";
+  const img = document.createElement("img");
+  img.src = h.imagen; img.alt = "Imagen de " + h.nombre; img.loading = "lazy";
+  img.addEventListener("error", () => foto.classList.add("sin-img"));
+  const ini = document.createElement("div"); ini.className = "inicial"; ini.setAttribute("aria-hidden","true");
+  ini.textContent = h.nombre.trim().charAt(0).toUpperCase();
+  const et = document.createElement("span"); et.className = "etiqueta"; et.textContent = h.etiqueta || "Humano digital";
+  foto.append(img, ini, et);
+  const cuerpo = document.createElement("div"); cuerpo.className = "cuerpo";
+  const t = document.createElement("h2"); t.textContent = h.nombre;
+  const p = document.createElement("p"); p.textContent = h.descripcion;
+  const a = document.createElement("a"); a.className = "boton";
+  if (activo) { a.href = h.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "Probar a " + h.nombre + " →"; }
+  else { a.textContent = "Próximamente"; a.setAttribute("aria-disabled","true"); }
+  cuerpo.append(t, p, a);
+  art.append(foto, cuerpo); grilla.append(art);
+}
+
+/* Ciudad futurista generada (siluetas con ventanas encendidas) */
+function ciudad(id, semilla, colores, cantidad, altMin, altMax){
+  let s = semilla; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const W = 1600, H = 400; let x = -20, out = "";
+  while (x < W + 20) {
+    const w = 40 + rnd() * 70, h = altMin + rnd() * (altMax - altMin), y = H - h;
+    const c = colores[Math.floor(rnd() * colores.length)];
+    out += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+    if (rnd() > .72) out += `<rect x="${x + w/2 - 2}" y="${y - 38}" width="4" height="38" fill="${c}"/><circle cx="${x + w/2}" cy="${y - 40}" r="3" fill="#ff7a59"/>`;
+    if (rnd() > .8) out += `<rect x="${x}" y="${y}" width="${w}" height="4" fill="#3fd1b5" opacity=".8"/>`;
+    for (let wy = y + 14; wy < H - 10; wy += 18)
+      for (let wx = x + 8; wx < x + w - 8; wx += 14)
+        if (rnd() > .6) out += `<rect x="${wx}" y="${wy}" width="6" height="8" fill="${rnd() > .55 ? '#3fd1b5' : '#f0a63a'}" opacity="${(.55 + rnd()*.45).toFixed(2)}"/>`;
+    x += w + 4 + rnd() * 10;
+  }
+  document.getElementById(id).innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice">${out}</svg>`;
+}
+ciudad("ciudadLejos", 7,  ["#1c3a40","#214248","#183238"], 0, 120, 300);
+ciudad("ciudadCerca", 42, ["#3a2a2a","#432f2d","#2f2323"], 0, 70, 230);
+</script>
+</body>
+</html>
