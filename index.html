@@ -88,8 +88,34 @@
   .lema{font-family:Georgia,serif;font-style:italic;color:var(--oro2);margin-top:6px;font-size:1.05rem;text-shadow:0 2px 8px rgba(0,0,0,.6)}
 
   main{max-width:1120px;margin:0 auto;padding:34px 20px 80px}
-  .grilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:26px;justify-content:center}
-  .grilla:has(.tarjeta:only-child){grid-template-columns:minmax(270px,380px)}
+  /* Carrusel horizontal: se desliza con el dedo, el mouse, las flechas o el teclado */
+  main{max-width:none;padding-inline:0}
+  .carrusel{position:relative;--ancho:min(330px,80vw)}
+  .grilla{
+    display:flex;gap:26px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;
+    padding:22px max(16px,calc(50% - var(--ancho)/2)) 30px;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+    cursor:grab;outline:none;
+  }
+  .grilla::-webkit-scrollbar{display:none}
+  .grilla.arrastrando{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto;user-select:none}
+  .grilla .tarjeta{flex:0 0 var(--ancho);scroll-snap-align:center;scroll-snap-stop:always}
+  .flecha{
+    position:absolute;top:42%;transform:translateY(-50%);z-index:5;width:52px;height:52px;border-radius:50%;
+    border:2px solid var(--oro);background:rgba(18,40,44,.88);color:var(--oro2);font-size:1.6rem;line-height:1;
+    cursor:pointer;box-shadow:0 0 22px rgba(63,209,181,.45);transition:background .2s,opacity .2s;
+  }
+  .flecha:hover{background:rgba(63,209,181,.3)}
+  .flecha:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+  .flecha[disabled]{opacity:.25;cursor:default}
+  .flecha.ant{left:14px}
+  .flecha.sig{right:14px}
+  @media (max-width:700px){.flecha{display:none}}
+  .puntos{display:flex;justify-content:center;gap:10px;margin-top:4px;flex-wrap:wrap;padding:0 16px}
+  .punto{width:12px;height:12px;border-radius:50%;border:2px solid var(--oro);background:transparent;cursor:pointer;padding:0;transition:background .2s,transform .2s}
+  .punto[aria-current="true"]{background:var(--oro);transform:scale(1.25)}
+  .punto:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+  .pista{text-align:center;color:var(--oro2);font-size:.85rem;letter-spacing:.18em;text-transform:uppercase;margin-top:14px;text-shadow:0 2px 6px #000}
   .tarjeta{
     background:linear-gradient(180deg,rgba(58,42,38,.95),rgba(34,26,24,.97));
     border:2px solid var(--oro);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;
@@ -149,7 +175,13 @@
 </header>
 
 <main>
-  <section class="grilla" id="grilla" aria-label="Lista de humanos digitales"></section>
+  <div class="carrusel" role="region" aria-roledescription="carrusel" aria-label="Humanos digitales">
+    <button class="flecha ant" id="ant" aria-label="Anterior">‹</button>
+    <section class="grilla" id="grilla" tabindex="0" aria-label="Lista de humanos digitales. Deslizá o usá las flechas del teclado."></section>
+    <button class="flecha sig" id="sig" aria-label="Siguiente">›</button>
+    <div class="puntos" id="puntos"></div>
+    <p class="pista">← Deslizá para elegir →</p>
+  </div>
   <p class="aviso">Los humanos digitales y sus historias son ficticios. Hablan con inteligencia artificial y pueden equivocarse. Algunos usan el micrófono: se te va a pedir permiso.</p>
 </main>
 
@@ -196,6 +228,20 @@ const HUMANOS = [
     descripcion: "Un personaje educativo creado con IA que cuenta la historia y la naturaleza de Formosa: fauna, flora y El Colorado. Se puede conversar por voz o texto.",
     imagen: "img/zamba.jpg",
     url: "https://baezkaren113-collab.github.io/Detectives-del-aula/zamba-explora-formosa/?v=6"
+  },
+  {
+    nombre: "Manuel Belgrano",
+    etiqueta: "Realidad aumentada",
+    descripcion: "Humano digital educativo con Lente DIA. Imprimí la lámina en A4 al 100 % y apuntá la cámara para conversar con él.",
+    imagen: "img/belgrano.jpg",
+    url: "https://mnoemiko-ux.github.io/belenlamina/"
+  },
+  {
+    nombre: "Guaz",
+    etiqueta: "Humano digital",
+    descripcion: "Un humano digital en 3D para conversar por voz o por escrito. Girá el modelo, acercate y hacele tu pregunta.",
+    imagen: "img/guaz.jpg",
+    url: "https://lulubritez34-cmyk.github.io/Guaz-/"
   }
   /* , {
     nombre: "Nombre",
@@ -228,6 +274,66 @@ for (const h of HUMANOS) {
   cuerpo.append(t, p, a);
   art.append(foto, cuerpo); grilla.append(art);
 }
+
+/* ---- Carrusel: flechas, puntos, teclado y arrastre con mouse ---- */
+(function(){
+  const tarjetas = [...grilla.children];
+  const puntos = document.getElementById("puntos");
+  const ant = document.getElementById("ant"), sig = document.getElementById("sig");
+  let actual = 0;
+  const reducir = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  tarjetas.forEach((t, i) => {
+    const b = document.createElement("button");
+    b.className = "punto"; b.type = "button";
+    b.setAttribute("aria-label", "Ir a " + HUMANOS[i].nombre);
+    b.addEventListener("click", () => ir(i));
+    puntos.append(b);
+  });
+  function centro(t){ return t.offsetLeft + t.offsetWidth/2 - grilla.clientWidth/2; }
+  let hasta = 0, fin;
+  function ir(i){
+    i = Math.max(0, Math.min(tarjetas.length - 1, i));
+    actual = i; hasta = Date.now() + 800; pintar();
+    grilla.scrollTo({left: centro(tarjetas[i]), behavior: reducir ? "auto" : "smooth"});
+  }
+  function pintar(){
+    [...puntos.children].forEach((p, i) => p.setAttribute("aria-current", i === actual ? "true" : "false"));
+    ant.disabled = actual === 0; sig.disabled = actual === tarjetas.length - 1;
+  }
+  function marcar(){
+    if (Date.now() < hasta) return;
+    let mejor = 0, dmin = Infinity;
+    tarjetas.forEach((t, i) => { const d = Math.abs(centro(t) - grilla.scrollLeft); if (d < dmin){ dmin = d; mejor = i; } });
+    actual = mejor; pintar();
+  }
+  ant.addEventListener("click", () => ir(actual - 1));
+  sig.addEventListener("click", () => ir(actual + 1));
+  grilla.addEventListener("scroll", () => { requestAnimationFrame(marcar); clearTimeout(fin); fin = setTimeout(() => { hasta = 0; marcar(); }, 150); }, {passive:true});
+  grilla.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight"){ e.preventDefault(); ir(actual + 1); }
+    if (e.key === "ArrowLeft"){ e.preventDefault(); ir(actual - 1); }
+  });
+  /* arrastrar con mouse (el dedo ya desliza solo) */
+  let down = false, x0 = 0, s0 = 0, movido = false;
+  grilla.addEventListener("pointerdown", e => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    down = true; movido = false; x0 = e.clientX; s0 = grilla.scrollLeft;
+  });
+  window.addEventListener("pointermove", e => {
+    if (!down) return;
+    const dx = e.clientX - x0;
+    if (Math.abs(dx) > 5){ movido = true; grilla.classList.add("arrastrando"); }
+    if (movido) grilla.scrollLeft = s0 - dx;
+  });
+  window.addEventListener("pointerup", () => {
+    if (!down) return; down = false;
+    if (movido){ grilla.classList.remove("arrastrando"); ir(actual); }
+  });
+  grilla.addEventListener("click", e => { if (movido){ e.preventDefault(); e.stopPropagation(); movido = false; } }, true);
+  grilla.addEventListener("dragstart", e => e.preventDefault());
+  addEventListener("resize", () => ir(actual));
+  grilla.scrollLeft = 0; marcar();
+})();
 
 /* Ciudad futurista generada (siluetas con ventanas encendidas) */
 function ciudad(id, semilla, colores, cantidad, altMin, altMax){
