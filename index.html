@@ -144,9 +144,67 @@
   footer{text-align:center;padding:0 20px 30px;color:var(--suave);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;text-shadow:0 2px 6px #000}
   @media (max-width:700px){.titulos{order:3;flex-basis:100%}.cartel img{height:84px}.cartel{--giro:0deg !important}}
   @media (prefers-reduced-motion:reduce){.tarjeta{transition:none}}
+
+  /* ---------- INTRO / BIENVENIDA ---------- */
+  .intro{
+    position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;text-align:center;
+    padding:24px;overflow:auto;
+    background:radial-gradient(ellipse at 50% 55%,rgba(8,26,29,.5),rgba(5,16,19,.82) 80%);
+        transition:opacity .8s ease,transform .8s ease,visibility .8s;
+  }
+  body.con-intro header,body.con-intro main,body.con-intro footer{visibility:hidden}
+  .intro.salir{opacity:0;transform:scale(1.08);visibility:hidden;pointer-events:none}
+  .intro-caja{max-width:960px;display:flex;flex-direction:column;align-items:center;gap:14px}
+  .intro-logos{display:flex;gap:18px;justify-content:center;margin-bottom:6px}
+  .intro-logos .cartel img{height:clamp(64px,11vw,96px)}
+  .intro-logos .cartel{--giro:0deg}
+  .intro .evento{font-size:.8rem}
+  .intro .bienvenidos{font-family:Georgia,serif;font-style:italic;font-size:clamp(1.3rem,3.6vw,2rem);color:var(--oro2);text-shadow:0 2px 10px #000}
+  .intro h1{font-size:clamp(2.6rem,9vw,5.6rem);margin:0;white-space:nowrap}
+  .intro .pueblo{font-size:clamp(1.05rem,2.6vw,1.35rem);color:var(--texto);text-shadow:0 2px 10px #000;max-width:560px;line-height:1.4}
+  .intro .futuro{font-family:Georgia,serif;font-style:italic;font-size:clamp(1.15rem,3vw,1.6rem);color:var(--oro2);text-shadow:0 2px 10px #000}
+  .intro .entrar{
+    margin-top:14px;font:inherit;font-weight:800;font-size:1.15rem;cursor:pointer;border:0;
+    background:var(--oro);color:#2b1a05;padding:16px 34px;border-radius:999px;
+    box-shadow:0 0 0 5px rgba(240,166,58,.25),0 0 34px rgba(240,166,58,.6);
+    animation:subir .9s ease 2.1s forwards,late 1.8s ease-in-out 3.1s infinite;
+  }
+  .intro .entrar:hover{background:var(--oro2)}
+  .intro .entrar:focus-visible{outline:4px solid var(--teal);outline-offset:4px}
+  .intro .saltar{font-size:.8rem;color:var(--suave);letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+  .intro-caja > *{opacity:0;transform:translateY(18px);animation:subir .9s ease forwards}
+  .intro-caja > :nth-child(1){animation-delay:.1s}
+  .intro-caja > :nth-child(2){animation-delay:.35s}
+  .intro-caja > :nth-child(3){animation-delay:.6s}
+  .intro-caja > :nth-child(4){animation-delay:1s}
+  .intro-caja > :nth-child(5){animation-delay:1.4s}
+  .intro-caja > :nth-child(6){animation-delay:1.8s}
+  .intro-caja > :nth-child(7){animation-delay:2.1s}
+  @keyframes subir{to{opacity:1;transform:none}}
+  @keyframes late{50%{transform:scale(1.06)}}
+  @media (prefers-reduced-motion:reduce){
+    .intro-caja > *{animation:none;opacity:1;transform:none}
+    .intro .entrar{animation:none}.intro{transition:none}
+  }
 </style>
 </head>
 <body>
+
+<!-- Intro de bienvenida -->
+<div class="intro" id="intro" role="dialog" aria-modal="true" aria-labelledby="introTitulo">
+  <div class="intro-caja">
+    <div class="intro-logos">
+      <div class="cartel"><img src="img/logo-rfa.png" alt="Logo RFA El Colorado"></div>
+      <div class="cartel"><img src="img/logo-ia.png" alt="Logo Inteligencia Artificial"></div>
+    </div>
+    <div class="evento">IA El Colorado · Expo de Ciencias 2026</div>
+    <div class="bienvenidos">Bienvenidos a</div>
+    <h1 id="introTitulo">Humanos digitales</h1>
+    <p class="pueblo">Nuestro pueblo, contado con inteligencia artificial.</p>
+    <p class="futuro">El futuro no se espera, se aprende.</p>
+    <button class="entrar" id="entrar" type="button">Conocelos →</button>
+  </div>
+</div>
 
 <!-- Escenario: ciudad futurista -->
 <div class="escena" aria-hidden="true">
@@ -369,6 +427,25 @@ function ciudad(id, semilla, colores, cantidad, altMin, altMax){
 }
 ciudad("ciudadLejos", 7,  ["#1c3a40","#214248","#183238"], 0, 120, 300);
 ciudad("ciudadCerca", 42, ["#3a2a2a","#432f2d","#2f2323"], 0, 70, 230);
+
+/* ---- Intro de bienvenida ---- */
+(function(){
+  const intro = document.getElementById("intro");
+  const resto = [document.querySelector("header"), document.querySelector("main"), document.querySelector("footer")];
+  resto.forEach(e => e && e.setAttribute("inert", ""));
+  document.body.style.overflow = "hidden"; document.body.classList.add("con-intro");
+  const btn = document.getElementById("entrar");
+  setTimeout(() => btn.focus({preventScroll:true}), 2100);
+  function cerrar(){
+    if (intro.classList.contains("salir")) return;
+    intro.classList.add("salir");
+    resto.forEach(e => e && e.removeAttribute("inert"));
+    document.body.style.overflow = ""; document.body.classList.remove("con-intro");
+    setTimeout(() => { intro.remove(); grilla.focus({preventScroll:true}); }, 850);
+  }
+  btn.addEventListener("click", cerrar);
+  addEventListener("keydown", e => { if (e.key === "Escape") cerrar(); });
+})();
 </script>
 </body>
 </html>
